@@ -31,16 +31,22 @@ services:
       EMQX_DASHBOARD__DEFAULT_PASSWORD: superAdmin
       EMQX_NODE__NAME: foo_emqx@${nameproject}
 
-      EMQX_AUTH__MONGO__SERVER: mongoDB:27017
-      EMQX_AUTH__MONGO__DATABASE: emqx_auth
-      EMQX_AUTH__MONGO__AUTH_MECHANISM: SCRAM-SHA-256
-      EMQX_AUTH__MONGO__USER: user
-      EMQX_AUTH__MONGO__PASSWORD: pass
-      EMQX_AUTH__MONGO__PASSWORD_HASH: sha256
-      EMQX_AUTH__MONGO__SUPERQUERY: '{ "is_superuser": true }'
-      EMQX_AUTH__MONGO__QUERY: '{ "username": "%u" }'
 
 
+
+
+      # Esto no funciona pero es el supueto para la version 5.7.2
+      # EMQX_AUTH__MONGODB__SERVER: mongoDB:27017
+      # EMQX_AUTH__MONGODB__DATABASE: emqx_auth
+      # EMQX_AUTH__MONGODB__AUTH_MECHANISM: SCRAM-SHA-256
+      # EMQX_AUTH__MONGODB__USER: user
+      # EMQX_AUTH__MONGODB__PASSWORD: pass
+      # EMQX_AUTH__MONGODB__PASSWORD_HASH: sha256
+      # EMQX_AUTH__MONGODB__SUPERQUERY: '{ "is_superuser": true }'
+      # EMQX_AUTH__MONGODB__QUERY: '{ "username": "%u" }'
+
+
+      # Esto no funciona pero es el supueto para la version 4
       # EMQX_AUTH__MONGO__SERVER: "mongodb:27017"
       # EMQX_AUTH__MONGO__LOGIN: user
       # EMQX_AUTH__MONGO__PASSWORD: pass
@@ -58,5 +64,10 @@ services:
       # EMQX_AUTH__MONGO__AUTH_QUERY__PASSWORD_FIELD: password
       # EMQX_AUTH__MONGO__AUTH_QUERY_SELECTOR: "username: %u"
 
+
+      # EMQX_AUTH__MONGO__ACL_QUERY: "on"
+      # EMQX_AUTH__MONGO__ACL_QUERY__COLECTION: "emqxauthrules"
+      # EMQX_AUTH__MONGO__ACL_QUERY__SELECTOR: "username: %u" # %u is the placeholder for username
+      # EMQX_LOADED_PLUGINS : "emqx_recon, emqx_retainer, emqx_management, emqx_dashboard, emqx_auth_mongo"
 
 

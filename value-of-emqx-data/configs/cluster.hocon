@@ -40,3 +40,20 @@ authentication = [
     username = user
   }
 ]
+authorization {
+  cache {
+    enable = true
+    excludes = []
+    max_size = 32
+    ttl = "1m"
+  }
+  deny_action = ignore
+  no_match = allow
+  sources = [
+    {
+      enable = true
+      path = "data/authz/acl.conf"
+      type = file
+    }
+  ]
+}

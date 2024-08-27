@@ -1,0 +1,59 @@
+authentication = [
+  {
+    backend = mongodb
+    collection = mqtt_user
+    database = emqx_auth
+    enable = true
+    filter {
+      username = "${username}"
+    }
+    is_superuser_field = is_superuser
+    mechanism = password_based
+    mongo_type = single
+    password = pass
+    password_hash_algorithm {name = plain, salt_position = disable}
+    password_hash_field = password
+    pool_size = 8
+    salt_field = salt
+    server = "mongoDB:27017"
+    srv_record = false
+    ssl {
+      ciphers = []
+      depth = 10
+      enable = false
+      hibernate_after = "5s"
+      log_level = notice
+      reuse_sessions = true
+      secure_renegotiate = true
+      verify = verify_peer
+      versions = [
+        "tlsv1.3",
+        "tlsv1.2"
+      ]
+    }
+    topology {
+      connect_timeout_ms = "20s"
+      heartbeat_frequency_ms = "200s"
+      max_overflow = 0
+    }
+    use_legacy_protocol = "false"
+    username = user
+  }
+]
+authorization {
+  cache {
+    enable = true
+    excludes = []
+    max_size = 32
+    ttl = "1m"
+  }
+  deny_action = ignore
+  no_match = allow
+  sources = [
+    {
+      enable = true
+      path = "data/authz/acl.conf"
+      type = file
+    }
+  ]
+}

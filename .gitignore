@@ -1,3 +1,4 @@
 emqx-log/
 emqx-data/
+mongoDB/
 .env

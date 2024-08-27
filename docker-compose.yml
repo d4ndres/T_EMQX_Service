@@ -1,14 +1,62 @@
 services:
+
+  mongodb:
+    container_name: mongoDB
+    image: mongodb/mongodb-community-server:6.0-ubi8
+    ports:
+      - 27017:27017  
+    volumes:
+      - ./mongoDB/db:/data/db
+      - ./mongoDB/configdb:/data/configdb
+    environment:
+      TZ: "America/Bogota"
+      MONGO_INITDB_ROOT_USERNAME: user
+      MONGO_INITDB_ROOT_PASSWORD: pass
+
+
   emqx:
+    depends_on:
+      - mongodb
     container_name: ${nameproject}
     image: emqx:5.7.2
     restart: always
     ports:
       - ${emqxdashport}:18083
+      - 8083:8083
     volumes:
       - ./emqx-data:/opt/emqx/data
       - ./emqx-log:/opt/emqx/log
     environment:
+      TZ: "America/Bogota"
       EMQX_DASHBOARD__DEFAULT_PASSWORD: superAdmin
       EMQX_NODE__NAME: foo_emqx@${nameproject}
-      TZ: "America/Bogota"
+
+      EMQX_AUTH__MONGO__SERVER: mongoDB:27017
+      EMQX_AUTH__MONGO__DATABASE: emqx_auth
+      EMQX_AUTH__MONGO__AUTH_MECHANISM: SCRAM-SHA-256
+      EMQX_AUTH__MONGO__USER: user
+      EMQX_AUTH__MONGO__PASSWORD: pass
+      EMQX_AUTH__MONGO__PASSWORD_HASH: sha256
+      EMQX_AUTH__MONGO__SUPERQUERY: '{ "is_superuser": true }'
+      EMQX_AUTH__MONGO__QUERY: '{ "username": "%u" }'
+
+
+      # EMQX_AUTH__MONGO__SERVER: "mongodb:27017"
+      # EMQX_AUTH__MONGO__LOGIN: user
+      # EMQX_AUTH__MONGO__PASSWORD: pass
+      # EMQX_AUTH__MONGO__AUTH_SOURCE: admin
+
+      # EMQX_AUTH__MONGO__USER__DATABASE: iotgl
+      # EMQX_AUTH__MONGO__USER_COLLECTION: emqxauthrules
+
+      # EMQX_AUTH__MONGO__SUPER_QUERY_COLLECTION: emqxsuperquery
+      # EMQX_AUTH__MONGO__SUPER_QUERY_SUPER_FIELD: is_superuser
+      # EMQX_AUTH__MONGO__SUPER_QUERY_SELECTOR: "username: %u"
+      # ENQX_AUTH__MONGO__SUPER_QUERY: off
+
+      # EMQX_AUTH__MONGO__AUTH_QUERY__PASSWORD_HASH: plain
+      # EMQX_AUTH__MONGO__AUTH_QUERY__PASSWORD_FIELD: password
+      # EMQX_AUTH__MONGO__AUTH_QUERY_SELECTOR: "username: %u"
+
+
+

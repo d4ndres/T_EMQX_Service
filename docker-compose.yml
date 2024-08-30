@@ -3,6 +3,7 @@ services:
   mongodb:
     container_name: mongoDB
     image: mongodb/mongodb-community-server:6.0-ubi8
+    restart: always
     ports:
       - 27017:27017  
     volumes:
@@ -23,51 +24,79 @@ services:
     ports:
       - ${emqxdashport}:18083
       - 8083:8083
-    volumes:
-      - ./emqx-data:/opt/emqx/data
-      - ./emqx-log:/opt/emqx/log
+    # volumes:
+    #   - ./emqx-data:/opt/emqx/data
+    #   - ./emqx-log:/opt/emqx/log
     environment:
       TZ: "America/Bogota"
       EMQX_DASHBOARD__DEFAULT_PASSWORD: superAdmin
-      EMQX_NODE__NAME: foo_emqx@${nameproject}
+      
+      # https://docs.emqx.com/en/emqx/latest/configuration/configuration.html#configuration-files
+      # Implementa funcionalidades en el dashboard, analiza que hizo e implementa en el dockercompose
+      EMQX_AUTHENTICATION__1__BACKEND: mongodb
+      EMQX_AUTHENTICATION__1__COLLECTION: mqtt_user
+      EMQX_AUTHENTICATION__1__DATABASE: emqx_auth
+      EMQX_AUTHENTICATION__1__ENABLE: true
+      EMQX_AUTHENTICATION__1__FILTER: '{ "username": "$${username}" }'
+      EMQX_AUTHENTICATION__1__IS_SUPERUSER_FIELD: is_superuser
+      EMQX_AUTHENTICATION__1__MECHANISM: password_based
+      EMQX_AUTHENTICATION__1__MONGO_TYPE: single
+      EMQX_AUTHENTICATION__1__PASSWORD: pass
+      EMQX_AUTHENTICATION__1__USERNAME: user
+      EMQX_AUTHENTICATION__1__PASSWORD_HASH_ALGORITHM__NAME: plain
+      EMQX_AUTHENTICATION__1__PASSWORD_HASH_ALGORITHM__SALT_POSITION: disable
+      EMQX_AUTHENTICATION__1__PASSWORD_HASH_FIELD: password
+      EMQX_AUTHENTICATION__1__POOL_SIZE: 8
+      EMQX_AUTHENTICATION__1__SALT_FIELD: salt
+      EMQX_AUTHENTICATION__1__SERVER: "mongoDB:27017"
+      EMQX_AUTHENTICATION__1__SRV_RECORD: false
+      EMQX_AUTHENTICATION__1__SSL__ENABLE: false
+      EMQX_AUTHENTICATION__1__TOPOLOGY__CONNECT_TIMEOUT_MS: "20s"
+      EMQX_AUTHENTICATION__1__TOPOLOGY__HEARTBEAT_FREQUENCY_MS: "200s"
+      EMQX_AUTHENTICATION__1__TOPOLOGY__MAX_OVERFLOW: 0
+      EMQX_AUTHENTICATION__1__USE_LEGACY_PROTOCOL: "false"
 
 
 
-
-
-      # Esto no funciona pero es el supueto para la version 5.7.2
-      # EMQX_AUTH__MONGODB__SERVER: mongoDB:27017
-      # EMQX_AUTH__MONGODB__DATABASE: emqx_auth
-      # EMQX_AUTH__MONGODB__AUTH_MECHANISM: SCRAM-SHA-256
-      # EMQX_AUTH__MONGODB__USER: user
-      # EMQX_AUTH__MONGODB__PASSWORD: pass
-      # EMQX_AUTH__MONGODB__PASSWORD_HASH: sha256
-      # EMQX_AUTH__MONGODB__SUPERQUERY: '{ "is_superuser": true }'
-      # EMQX_AUTH__MONGODB__QUERY: '{ "username": "%u" }'
-
-
-      # Esto no funciona pero es el supueto para la version 4
-      # EMQX_AUTH__MONGO__SERVER: "mongodb:27017"
-      # EMQX_AUTH__MONGO__LOGIN: user
-      # EMQX_AUTH__MONGO__PASSWORD: pass
-      # EMQX_AUTH__MONGO__AUTH_SOURCE: admin
-
-      # EMQX_AUTH__MONGO__USER__DATABASE: iotgl
-      # EMQX_AUTH__MONGO__USER_COLLECTION: emqxauthrules
-
-      # EMQX_AUTH__MONGO__SUPER_QUERY_COLLECTION: emqxsuperquery
-      # EMQX_AUTH__MONGO__SUPER_QUERY_SUPER_FIELD: is_superuser
-      # EMQX_AUTH__MONGO__SUPER_QUERY_SELECTOR: "username: %u"
-      # ENQX_AUTH__MONGO__SUPER_QUERY: off
-
-      # EMQX_AUTH__MONGO__AUTH_QUERY__PASSWORD_HASH: plain
-      # EMQX_AUTH__MONGO__AUTH_QUERY__PASSWORD_FIELD: password
-      # EMQX_AUTH__MONGO__AUTH_QUERY_SELECTOR: "username: %u"
-
-
-      # EMQX_AUTH__MONGO__ACL_QUERY: "on"
-      # EMQX_AUTH__MONGO__ACL_QUERY__COLECTION: "emqxauthrules"
-      # EMQX_AUTH__MONGO__ACL_QUERY__SELECTOR: "username: %u" # %u is the placeholder for username
-      # EMQX_LOADED_PLUGINS : "emqx_recon, emqx_retainer, emqx_management, emqx_dashboard, emqx_auth_mongo"
-
-
+# authentication = [
+#   {
+#     backend = mongodb
+#     collection = mqtt_user
+#     database = emqx_auth
+#     enable = true
+#     filter {
+#       username = "${username}"
+#     }
+#     is_superuser_field = is_superuser
+#     mechanism = password_based
+#     mongo_type = single
+#     password = pass
+#     password_hash_algorithm {name = plain, salt_position = disable}
+#     password_hash_field = password
+#     pool_size = 8
+#     salt_field = salt
+#     server = "mongoDB:27017"
+#     srv_record = false
+#     ssl {
+#       ciphers = []
+#       depth = 10
+#       enable = false
+#       hibernate_after = "5s"
+#       log_level = notice
+#       reuse_sessions = true
+#       secure_renegotiate = true
+#       verify = verify_peer
+#       versions = [
+#         "tlsv1.3",
+#         "tlsv1.2"
+#       ]
+#     }
+#     topology {
+#       connect_timeout_ms = "20s"
+#       heartbeat_frequency_ms = "200s"
+#       max_overflow = 0
+#     }
+#     use_legacy_protocol = "false"
+#     username = user
+#   }
+# ]

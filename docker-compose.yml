@@ -1,7 +1,7 @@
 services:
 
   mongodb:
-    container_name: mongoDB
+    container_name: ${DB_IOT}
     image: mongodb/mongodb-community-server:6.0-ubi8
     restart: always
     ports:
@@ -16,8 +16,8 @@ services:
 
 
   emqx:
-    depends_on:
-      - mongodb
+    # depends_on:
+    #   - ${DB_IOT}
     container_name: ${POYECT_NAME_EMQX}
     image: emqx:5.7.2
     restart: always
@@ -31,9 +31,13 @@ services:
       TZ: "America/Bogota"
       EMQX_DASHBOARD__DEFAULT_PASSWORD: superAdmin
       
+      # 1. Interactua con la plataforma emqx
+      # 2. Al crear authorization y authentication crea un archivo "/opt/emqx/data/configs/cluster.hocon"
+      # 3. Entender la documentacion del dockerhub: https://hub.docker.com/_/emqx
+      # 4. Poder modificar environment emqx:5.7.2 dockercompose
+
       # https://docs.emqx.com/en/emqx/latest/configuration/configuration.html#configuration-files
-      # Implementa funcionalidades en el dashboard, analiza que hizo e implementa en el dockercompose
-      EMQX_AUTHENTICATION__1__BACKEND: mongodb
+      EMQX_AUTHENTICATION__1__BACKEND: mongodb #Absolute
       EMQX_AUTHENTICATION__1__COLLECTION: mqtt_user
       EMQX_AUTHENTICATION__1__DATABASE: emqx_auth
       EMQX_AUTHENTICATION__1__ENABLE: true
@@ -48,10 +52,34 @@ services:
       EMQX_AUTHENTICATION__1__PASSWORD_HASH_FIELD: password
       EMQX_AUTHENTICATION__1__POOL_SIZE: 8
       EMQX_AUTHENTICATION__1__SALT_FIELD: salt
-      EMQX_AUTHENTICATION__1__SERVER: "mongoDB:27017"
+      EMQX_AUTHENTICATION__1__SERVER: "${DB_IOT}:27017"
       EMQX_AUTHENTICATION__1__SRV_RECORD: false
       EMQX_AUTHENTICATION__1__SSL__ENABLE: false
       EMQX_AUTHENTICATION__1__TOPOLOGY__CONNECT_TIMEOUT_MS: "20s"
       EMQX_AUTHENTICATION__1__TOPOLOGY__HEARTBEAT_FREQUENCY_MS: "200s"
       EMQX_AUTHENTICATION__1__TOPOLOGY__MAX_OVERFLOW: 0
       EMQX_AUTHENTICATION__1__USE_LEGACY_PROTOCOL: "false"
+
+      # Authorization
+      # https://docs.emqx.com/en/emqx/latest/access-control/authz/mongodb.html
+
+      EMQX_AUTHORIZATION__NO_MATCH: deny
+
+      # Authorization mongodb
+      EMQX_AUTHORIZATION__SOURCES__1__COLLECTION: mqtt_authorization
+      EMQX_AUTHORIZATION__SOURCES__1__DATABASE: emqx_auth
+      EMQX_AUTHORIZATION__SOURCES__1__ENABLE: true
+      EMQX_AUTHORIZATION__SOURCES__1__FILTER: '{ "username": "$${username}" }'
+      EMQX_AUTHORIZATION__SOURCES__1__MONGO_TYPE: single
+      EMQX_AUTHORIZATION__SOURCES__1__USERNAME: ${USER_ADMIN_MONGO}
+      EMQX_AUTHORIZATION__SOURCES__1__PASSWORD: ${PASS_ADMIN_MONGO}
+      EMQX_AUTHORIZATION__SOURCES__1__POOL_SIZE: 8
+      EMQX_AUTHORIZATION__SOURCES__1__SERVER: "${DB_IOT}:27017"
+      EMQX_AUTHORIZATION__SOURCES__1__SRV_RECORD: false
+      EMQX_AUTHORIZATION__SOURCES__1__SSL__ENABLE: false
+      EMQX_AUTHORIZATION__SOURCES__1__TOPOLOGY__CONNECT_TIMEOUT_MS: "20s"
+      EMQX_AUTHORIZATION__SOURCES__1__TOPOLOGY__HEARTBEAT_FREQUENCY_MS: "200s"
+      EMQX_AUTHORIZATION__SOURCES__1__TOPOLOGY__MAX_OVERFLOW: 0
+      EMQX_AUTHORIZATION__SOURCES__1__TYPE: mongodb #Absolute
+      EMQX_AUTHORIZATION__SOURCES__1__USE_LEGACY_PROTOCOL: "false"
+

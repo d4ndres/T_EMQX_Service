@@ -1,4 +1,6 @@
 # Archivo no funcional. solo para visualización
+# Esta misma configuraion esta escrita en el dockercompose
+
 authorization {
   cache {
     enable = true
@@ -7,8 +9,26 @@ authorization {
     ttl = "1m"
   }
   deny_action = ignore
-  no_match = allow
+  # EMQX_AUTHORIZATION__NO_MATCH: deny
+  no_match = deny
   sources = [
+      # EMQX_AUTHORIZATION__SOURCES__1__COLLECTION: mqtt_authorization
+      # EMQX_AUTHORIZATION__SOURCES__1__DATABASE: emqx_auth
+      # EMQX_AUTHORIZATION__SOURCES__1__ENABLE: true
+      # EMQX_AUTHORIZATION__SOURCES__1__FILTER: '{ "username": "$${username}" }'
+      # EMQX_AUTHORIZATION__SOURCES__1__MONGO_TYPE: single
+      # EMQX_AUTHORIZATION__SOURCES__1__USERNAME: ${USER_ADMIN_MONGO}
+      # EMQX_AUTHORIZATION__SOURCES__1__PASSWORD: ${PASS_ADMIN_MONGO}
+      # EMQX_AUTHORIZATION__SOURCES__1__POOL_SIZE: 8
+      # EMQX_AUTHORIZATION__SOURCES__1__SERVER: "mongoDB:27017"
+      # EMQX_AUTHORIZATION__SOURCES__1__SRV_RECORD: false
+      # EMQX_AUTHORIZATION__SOURCES__1__SSL__ENABLE: false
+      # EMQX_AUTHORIZATION__SOURCES__1__TOPOLOGY__CONNECT_TIMEOUT_MS: "20s"
+      # EMQX_AUTHORIZATION__SOURCES__1__TOPOLOGY__HEARTBEAT_FREQUENCY_MS: "200s"
+      # EMQX_AUTHORIZATION__SOURCES__1__TOPOLOGY__MAX_OVERFLOW: 0
+      # EMQX_AUTHORIZATION__SOURCES__1__TYPE: mongodb #Absolute
+      # EMQX_AUTHORIZATION__SOURCES__1__USE_LEGACY_PROTOCOL: "false"
+
     {
       collection = mqtt_authorization
       database = emqx_auth
@@ -44,6 +64,13 @@ authorization {
       use_legacy_protocol = auto
       username = diego
     },
+    
+    
+    
+    
+    # EMQX_AUTHORIZATION__SOURCES__2__ENABLE: true
+    # EMQX_AUTHORIZATION__SOURCES__2__PATH: "data/authz/acl.conf"
+    # EMQX_AUTHORIZATION__SOURCES__2__TYPE: file
     {
       enable = true
       path = "data/authz/acl.conf"
